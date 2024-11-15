@@ -1,0 +1,139 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage[spanish]{babel} %para definir el idioma
+% Para especificar los márgenes
+\usepackage[letterpaper,top=2cm,left=1.7cm,right=1.7cm,marginparwidth=1.5cm]{geometry}
+
+
+%librerias para insertar códigos
+\usepackage{listings}
+\usepackage{mdframed}
+\usepackage{caption}
+
+\usepackage{xcolor}
+\definecolor{grisClaro}{RGB}{232,232,232} %definir un nuevo color
+\definecolor{StringColor}{RGB}{9,159,70}
+\definecolor{CommentColor}{RGB}{162,162,162}
+\definecolor{libreria}{RGB}{159,9,154}
+\definecolor{tareas}{RGB}{0,32,233}
+
+\title{Inserción de códigos de lenguaje C}
+\author{Mariana Conde}
+\date{}
+
+%   DEFINIR UN CÓDIGO DE PROGRAMACIÓN
+\lstdefinelanguage{CStyle}{
+%   ESPECIFICAR LAS PALABRAS RESERVADAS
+%   PARA ESTE CÓDIGO EN PARTICULAR SE UTILIZARON 3 morekeywords PORQUE CADA PALABRA RESERVADA CONTENIDA EN ÉSTOS TIENE UN COLOR DIFERENTE
+    morekeywords = {
+        volatile, static, NULL, true, const, false
+    },
+    morekeywords = [2]{
+        include, float, char, void, bool, for, while, int, if, else, return
+    },
+    morekeywords = [3]{
+        xTaskCreate, uin32_t, mutex_init, vTaskStartScheduler, stdio_init_all, gpio_init, gpio_set_dir, gpio_put, adc_init, adc_set_temp_sensor_enabled, adc_select_input, printf, mutex_enter_blocking, mutex_exit, vTaskDelay, pdMS_TO_TICKS, uint16_t, adc_read, getchar, putchar, readInt, setup
+    },
+    sensitive=true,
+    morecomment=[l]//,     % COMENTARIO DE UNA LÍNEA
+    morecomment=[l]/*,     % COMENTARIO DE MÁS DE UNA LÍNEA
+    morestring=[b]",       % COMILLAS DOBLES PARA CADENAS DE TEXTO
+}
+%   CONFIGURACIÓN DEL CÓDIGO
+\lstset{
+  language=CStyle,
+  basicstyle=\ttfamily\footnotesize, % ESTILO DE FUENTE (monoespaciada)
+  keywordstyle=\color{red}\bfseries, % PALABRAS CLAVE EN COLOR ROJO
+  keywordstyle=[2]\color{libreria},  % PALABRAS CLAVE EN EL COLO DEFINIDO "LIBRERIA"
+  keywordstyle=[3]\color{tareas},   % PALABRAS CLAVE EN EL COLO DEFINIDO "TAREAS"
+  commentstyle=\color{CommentColor}, % COMENTARIOS EN EL COLOR DEFINIDO "CommentColor"
+  stringstyle=\color{StringColor}, % CADENAS DE TEXTO EN EL COLOR DEFINIDO "StringColor"
+  numbers=left, % MOSTRAR NÚMEROS DE LÍNEA A LA IZQUIERDA
+  numberstyle=\tiny\color{gray}, % ESTILO DE LOS NÚMEROS DE LÍNEA EN COLOR GRIS
+  stepnumber=1, % ENUMERAR CADA LÍNEA
+  breaklines=true, % DIVIDIR LAS LÍNEAS LARGAS
+  tabsize=2, % TAMAÑO DE TABULACIÓN
+  captionpos = t
+}
+%   FUNCIÓN PARA ENCUADRAR EL CÓDIGO
+%   SÓLO SE COLOCAN LAS LÍNEAS SUPERIOR E INFERIOR
+\mdfdefinestyle{topbottomframe}{
+    topline = true,
+    bottomline = true,
+    leftline = false,
+    rightline = false
+}
+%   PERSONALIZACIÓN DEL TÍTULO DEL CÓDIGO
+\DeclareCaptionFont{customfont}{\small}
+\captionsetup[lstlisting]{font=customfont, labelformat=simple}
+\renewcommand{\lstlistingname}{Código}
+
+
+\begin{document}
+
+\maketitle
+
+\begin{mdframed}[style=topbottomframe]
+\begin{lstlisting}[caption={\textcolor{gray}{\textbf{main.c - Temperatura obtenida}}},label={lst:temperatura_blink}]
+#include <hardware/adc.h>
+void main(void){
+    xTaskCreate( tempTask,                 /* The function that implements the task. */
+            "temp",                   /* The text name assigned to the task - for debug only as it is not used by the kernel. */
+            configMINIMAL_STACK_SIZE,  /* The size of the stack to allocate to the task. */
+            NULL,                      /* The parameter passed to the task - not used in this case. */
+            1,                         /* The priority assigned to the task. */
+            NULL );  
+}
+static void tempTask(void *param){
+const float K = 3.3f/(1<<12);
+  while(true){
+    uint16_t adc = adc_read();
+    float voltage = (adc * K);
+    float tempC = 27-(voltage-0.706)*(1/0.001721);
+    float tempF = (tempC * 9/5) + 32;
+    printf("Temperatura %0.2f \circ C\n",tempC);
+    printf("Temperatura %0.2f \circ F\n",tempF);
+    vTaskDelay(pdMS_TO_TICKS(1000));
+  }
+}
+\end{lstlisting}
+\end{mdframed}
+
+
+\begin{mdframed}[style=topbottomframe]
+\begin{lstlisting}[caption={\textcolor{gray}{\textbf{main.c - Atenuación del led centinela}}},label={lst:atenuacion_blink}]
+static void blinkTask( void *param ){
+    uint32_t brillo;
+    const uint32_t periodo = 20;
+    printf("Starting blink.\n");
+    while(true){
+        mutex_enter_blocking(&mutex);
+        brillo = svDelay;
+        mutex_exit(&mutex);
+        float encendido = (brillo * periodo) / 100;
+        float apagado = periodo - encendido;
+        gpio_put(PICO_DEFAULT_LED_PIN,1);
+        vTaskDelay(pdMS_TO_TICKS(encendido));        
+        gpio_put(PICO_DEFAULT_LED_PIN,0);
+        vTaskDelay(pdMS_TO_TICKS(apagado));        
+    }
+}
+static void usbTask( void *param ){
+    uint32_t delay;
+    vTaskDelay(pdMS_TO_TICKS(400));
+    while(true){
+        printf("Nivel de brillo deseado: ");
+        if(!readInt(&delay) || delay > 100){
+            printf("\nValor invalido\n");
+            continue;
+        }
+        mutex_enter_blocking(&mutex);
+        svDelay = delay;
+        mutex_exit(&mutex);
+        printf("\nDelay set to %d\n", delay);
+    }
+}
+\end{lstlisting}
+\end{mdframed}
+
+\end{document}
