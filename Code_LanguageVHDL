@@ -1,0 +1,182 @@
+%   EN EL SIGUIENTE LINK SE ENCUENTRA EL ARCHIVO EN OVERLEAF PARA MOSTRAR EL RESULTADO DEL PRESENTE CÓDIGO
+%   https://www.overleaf.com/project/6736d782fb1ad1644ce4260a
+
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage[spanish]{babel} %para definir el idioma
+% Para especificar los márgenes
+\usepackage[letterpaper,top=2cm,left=1.7cm,right=1.7cm,marginparwidth=1.5cm]{geometry}
+
+%librerias para insertar códigos
+\usepackage{listings}
+\usepackage{mdframed}
+\usepackage{caption}
+
+\usepackage{xcolor}
+\definecolor{grisClaro}{RGB}{232, 232, 232}
+
+\title{Inserción de códigos del lenguaje VHDL}
+\author{Mariana Conde}
+\date{}
+
+%   DEFINIR UN CÓDIGO DE PROGRAMACIÓN
+\lstdefinelanguage{VHDL}{
+%   ESPECIFICAR LAS PALABRAS RESERVADAS
+   morekeywords={
+    architecture, entity, is, port, in, out, signal, process, begin, end, if, then, else, when, others, case, report, severity, library, use, all, wait, for, generic,type,signal,rising_edge, attribute, elsif, end case
+  },
+    sensitive=true,
+    morecomment=[l]--,     % COMENTARIO DE UNA LÍNEA
+    morestring=[b]",       % COMILLAS DOBLES PARA CADENAS DE TEXTO
+}
+%   CONFIGURACIÓN DEL CÓDIGO
+\lstset{
+  language=VHDL,
+  basicstyle=\ttfamily\footnotesize, % ESTILO DE FUENTE (monoespaciada)
+  keywordstyle=\color{blue}\bfseries, % PALABRAS CLAVE EN AZUL Y NEGRITA
+  commentstyle=\color{gray}, % COMENTARIOS EN GRIS
+  stringstyle=\color{red}, % CADENAS DE TEXTO EN ROJO
+  numbers=left, % MOSTRAR NÚMEROS DE LÍNEA A LA IZQUIERDA
+  numberstyle=\tiny\color{gray}, % ESTILO DE LOS NÚMEROS DE LÍNEA
+  stepnumber=1, % NUMERAR CADA LÍNEA
+  breaklines=true, % DIVIDIR LAS LÍNEAS LARGAS
+  tabsize=2, % TAMAÑO DE TABULACIÓN
+  captionpos = t
+}
+%   PERSONALIZACIÓN DEL TÍTULO DEL CÓDIGO
+\DeclareCaptionFont{customfont}{\small}
+\captionsetup[lstlisting]{font=customfont, labelformat=simple}
+\renewcommand{\lstlistingname}{Código}
+
+%   FUNCIÓN PARA ENCUADRAR EL CÓDIGO
+%   SÓLO SE COLOCAN LAS LÍNEAS SUPERIOR E INFERIOR
+\mdfdefinestyle{topbottomframe}{
+    topline = true,
+    bottomline = true,
+    leftline = false,
+    rightline = false
+}
+%   PERSONALIZACIÓN DEL TÍTULO DEL CÓDIGO
+\DeclareCaptionFont{customfont}{\small}
+\captionsetup[lstlisting]{font=customfont, labelformat=simple}
+\renewcommand{\lstlistingname}{Código}
+
+
+\begin{document}
+
+\maketitle
+
+\begin{mdframed}[style=topbottomframe]
+\begin{lstlisting}[caption={Divisor de frecuencia},label={lst:div_freq}]
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity DIV_FREQ is
+generic(limit: integer := 249999);
+port(CLK:	in std_logic;
+	  DIVF:	buffer std_logic);
+end DIV_FREQ;
+
+architecture clk of DIV_FREQ is
+begin
+    process(CLK)
+    begin
+        if rising_edge(CLK) then
+            if AUX = limit then
+               AUX <= 0;
+               AUX <= NOT AUX;
+            else
+					AUX <= AUX + 1;
+            end if;
+        end if;
+    end process;
+end clk;
+\end{lstlisting}
+\end{mdframed}
+
+
+\begin{mdframed}[style=topbottomframe]
+\begin{lstlisting}[caption={Máquina de estados},label={lst:state_machine}]
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity PuertadeAuto is
+	Port(clk:               in  STD_LOGIC;
+         sw1,sw2,lsw1,lsw2: in std_logic;
+         ENA1,ENA2:         out std_logic);
+end PuertadeAuto;
+
+architecture estructura of PuertadeAuto is
+type estados is (inicio,e1,baja,guarda1,sube,guarda2,paro1,paro2);
+signal presente: estados;
+signal div: std_logic;
+signal SW_1,SW_2,LSW_1,LSW_2: std_logic;
+attribute enum_encoding: string;
+attribute enum_encoding of estados: type is "compact";
+
+component DIV_FREQ is
+	port( clk:	in std_logic;
+	   DIVF:	out std_logic);
+end component;
+begin
+reloj: DIV_FREQ port map(clk => clk, DIVF =>div);
+SW_1 <= SW1;
+SW_2 <= SW2;
+LSW_1 <= LSW1;
+LSW_2 <= LSW2;
+process(div)
+begin
+	if  rising_edge(div) then
+		case (presente) is
+		when inicio => 
+			ENA1 <= '0';
+			ENA2 <= '0';
+			presente <= e1;
+		when e1 =>
+			ENA1 <= '0'; ENA2 <= '0';
+			if (SW_1 = '1' and SW_2 = '0' and LSW_1 = '0' and LSW_2 = '0')   then
+				presente <= baja;
+			elsif (SW_1 = '0' and SW_2 = '1' and LSW_1 = '0' and LSW_2 = '0') then
+				presente <= sube;
+			elsif (SW_1 = '0' and SW_2 = '1' and LSW_1 = '1' and LSW_2 = '0') then
+				presente <= sube;
+			elsif (SW_1 = '1' and SW_2 = '0' and LSW_1 = '0' and LSW_2 = '1') then
+				presente <= baja;
+			end if;
+       when baja =>
+    			ENA1 <= '1'; ENA2 <= '0';
+    			presente <= guarda1;
+    		when guarda1 =>
+    			ENA1 <= '1'; ENA2 <= '0';
+    			if(LSW_1 = '1' and LSW_2 = '0') then
+    				presente <= paro1;
+    			else
+    				presente <= inicio;
+    			end if;
+    		when sube =>
+    			ENA1 <= '0'; ENA2 <= '1';
+    			presente <= guarda2;
+    		when guarda2 =>
+    			if(LSW_1 = '0' and LSW_2 = '1') then
+    				presente <= paro2;
+    			else
+    				presente <= inicio;
+    			end if;
+    		when paro1 =>
+    			ENA1 <= '0'; ENA2 <= '0';
+    			presente <= inicio;
+    		when paro2 =>
+    			ENA1 <= '0'; ENA2 <= '0';
+    			presente <= inicio;
+    		when others =>
+    			ENA1 <= '0';
+    			ENA2 <= '0';
+    			presente <= e1;
+		end case;
+	end if;
+end process;
+end estructura;
+\end{lstlisting}
+\end{mdframed}
+
+\end{document}
