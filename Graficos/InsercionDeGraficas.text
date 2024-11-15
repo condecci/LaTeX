@@ -1,0 +1,105 @@
+%   EN EL SIGUIENTE LINK SE ENCUENTRA EL ARCHIVO EN OVERLEAF PARA MOSTRAR EL RESULTADO DEL PRESENTE CÓDIGO
+%   https://www.overleaf.com/3727863282jdqyjgfhbrkf#318bef
+
+\documentclass{article}
+\usepackage[spanish, es-tabla]{babel}
+\usepackage[letterpaper,top=2cm,left=1.7cm,right=1.7cm,marginparwidth=1.5cm]{geometry}
+\usepackage{amsmath}
+\usepackage{array}
+% PAQUETES PARA CREACIÓN DE TABLAS
+\usepackage[table,xcdraw]{xcolor}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{multirow,multicol, colortbl}
+
+\definecolor{grisOscuro}{RGB}{75, 75, 75}
+
+\title{Inserción de Tablas}
+\author{Mariana Conde}
+\date{}
+\begin{document}
+
+\maketitle
+\section{Tablas con celdas combinadas horizontalmente}
+\begin{table}[h]
+    \centering  %   CENTRAR LA TABLA EN LA HOJA
+    % POR CADA "p" ES UNA COLUMNA Y DENTRO DE LOS CORCHETES QUE LA ACOMPAÑAN SE COLOCA EL ANCHO QUE SE DESEA PARA CADA COLUMNA
+    \begin{tabular}{|>{\centering\arraybackslash}p{1.5cm}|>{\centering\arraybackslash}p{1.5cm}|>{\centering\arraybackslash}p{1.5cm}|>{\centering\arraybackslash}p{1.5cm}|>{\centering\arraybackslash}p{1.5cm}|>{\centering\arraybackslash}p{1.5cm}|>{\centering\arraybackslash}p{1.5cm}}
+            \hline  % INDICA EL FIN DEL RENGLÓN PARA PASAR AL SIGUIENTE
+        % MULTICOLUMN SE UTILIZA PARA COMBINAR DOS CELDAS HORIZONTALMENTE
+        %RULE SE UTILIZA PARA DEFINIR EL ANCHO DE LOS RENGLONES
+        % PARA ESCRIBIR EN CADA UNA DE LAS COLUMNAS, EL TEXTO SE SEPARA CON UN "&"
+        %CELLCOLOR ES PARA COLOREAR UNA CELDA
+        \multicolumn{2}{|c|}{\rule{0pt}{2.5ex}Subir/Bajar} & \multicolumn{2}{c|}{Sensores de detección} & \multicolumn{2}{c|}{Habilitación del motor} \\ \hline
+         \rule{0pt}{2.5ex}SW1 & SW2 & LSW1 & LSW2 & ENA1 & ENA2  \\ \hline
+        \rule{0pt}{2.5ex}1 & 0 & 0 & 0 & \cellcolor{lightgray}1 & \cellcolor{lightgray}0 \\
+         \rule{0pt}{2.5ex}0 & 1 & 0 & 0 & \cellcolor{lightgray}0 & \cellcolor{lightgray}1 \\
+         \rule{0pt}{2.5ex}1 & 0 & 1 & 0 & 0 & 0 \\
+         \rule{0pt}{2.5ex}0 & 1 & 0 & 1 & 0 & 0 \\
+         \rule{0pt}{2.5ex}0 & 1 & 1 & 0 & \cellcolor{lightgray}0 & \cellcolor{lightgray}1 \\
+         \rule{0pt}{2.5ex}1 & 0 & 0 & 1 & \cellcolor{lightgray}1 & \cellcolor{lightgray}0 \\ \hline
+    \end{tabular}
+    \caption{Tabla de verdad}   % TÍTULO DE LA TABLAS
+    \label{tab:TablaDeVerdad}   % ETIQUETA POR SI SE DESEA CREAR UN HIPERVINCULO A ESTA TABLA
+\end{table}
+
+\newpage
+\section{Tablas con celdas combinadas horizontal y verticalmente}
+\begin{table}[h!]
+    \centering
+    \arrayrulecolor{grisOscuro} % SE ESTABLECE EL TONO DE LA CUADRÍCULA DE LA TABLA
+    \begin{tabular}{|>{\centering\arraybackslash}p{1.5cm}|>{\centering\arraybackslash}p{0.8cm}|>{\centering\arraybackslash}p{0.8cm}|>{\centering\arraybackslash}p{0.8cm}|>{\centering\arraybackslash}p{0.8cm}|>{\centering\arraybackslash}p{0.8cm}|>{\centering\arraybackslash}p{0.8cm}|>{\centering\arraybackslash}p{0.8cm}|>{\centering\arraybackslash}p{1cm}|>{\centering\arraybackslash}p{1cm}|>{\centering\arraybackslash}p{1cm}|>{\centering\arraybackslash}p{1cm}|>{\centering\arraybackslash}p{1cm}|}
+        \hline
+        % MULTIROW SE UTILIZA PARA COMBINAR LAS CELDAS VERTICALMENTE
+        % textbf SE UTILIZA PARA PONER EN NEGRITAS UNA PALABRA O FRASE
+        % textit SE UTILIZA PARA PONER EN CUSRIVA UNA PALABRA O FRASE
+         \multirow{2}{*}{}&\multicolumn{3}{|c|}{\rule{0pt}{3ex}\textbf{\textit{Edo. presente}}} & \multicolumn{4}{c|}{\textbf{\textit{Entradas}}} & \multicolumn{3}{c|}{\textbf{\textit{Liga}}} & \multicolumn{2}{c|}{\textbf{\textit{Salidas}}} \\ \cline{2-13}
+        & \rule{0pt}{3ex} \textit{q0} & \textit{q1} & \textit{q2} & \textit{sw1} & \textit{sw2} & \textit{lsw1} & \textit{lsw1} & \textit{L0} & \textit{L1} & \textit{L2} & \textit{ENA1} & \textit{ENA2} \\ \hline
+        \multirow{16}{*}{INICIO} & \rule{0pt}{2ex}0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 1 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 1 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 0 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & 1 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 0 & 0 & 0 & 1 & 0 & 1 & 0 & 0 & 1 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 1 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 0 & 0 & 0 & 1 & 1 & 1 & 0 & 0 & 1 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 0 & 0 & 1 & 0 & 0 & 1 & 0 & 0 & 1 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 0 & 0 & 1 & 0 & 1 & 0 & 0 & 0 & 1 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 0 & 0 & 1 & 0 & 1 & 1 & 0 & 0 & 1 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 0 & 0 & 1 & 1 & 1 & 0 & 0 & 0 & 1 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 0 & 0 & 1 & 1 & 1 & 1 & 0 & 0 & 1 & 0 & 0 \\ \hline
+        \multirow{16}{*}{E1} & \rule{0pt}{2ex}0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 0 & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 0 & 1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 0 & 1 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 0 & 1 & 0 & 1 & 0 & 0 & 0 & 1 & 1 & 0 & 1 \\
+        & \rule{0pt}{2ex}0 & 0 & 1 & 0 & 1 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 0 & 1 & 0 & 1 & 1 & 0 & 0 & 1 & 1 & 0 & 1 \\
+        & \rule{0pt}{2ex}0 & 0 & 1 & 0 & 1 & 1 & 1 & 0 & 0 & 0 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 0 & 1 & 1 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 0 & 1 & 1 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 \\
+        & \rule{0pt}{2ex}\rule{0pt}{2ex}0 & 0 & 1 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 0 & 1 & 1 & 1 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 0 & 1 & 1 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 0 & 1 & 1 & 1 & 1 & 1 & 0 & 0 & 0 & 0 & 0 \\ \hline
+        \multirow{16}{*}{BAJA} & \rule{0pt}{2ex}0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+        & \rule{0pt}{2ex}0 & 1 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 1 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 1 & 0 & 0 & 1 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 1 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 1 & 0 & 0 & 1 & 1 & 1 & 0 & 0 & 0 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 1 & 0 & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 1 & 0 \\
+        & \rule{0pt}{2ex}0 & 1 & 0 & 1 & 0 & 0 & 1 & 1 & 0 & 0 & 1 & 0 \\
+        & \rule{0pt}{2ex}0 & 1 & 0 & 1 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 1 & 0 & 1 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 1 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 1 & 0 & 1 & 1 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 1 & 0 & 1 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+        & \rule{0pt}{2ex}0 & 1 & 0 & 1 & 1 & 1 & 1 & 0 & 0 & 0 & 0 & 0 \\\hline
+\end{tabular}
+\end{table}
+
+
+\end{document}
