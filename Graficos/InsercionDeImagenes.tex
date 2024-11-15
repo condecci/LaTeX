@@ -1,0 +1,48 @@
+% EN EL SIGUIENTE LINK SE ENCUENTRA EL ARCHIVO EN OVERLEAF PARA MOSTRAR EL RESULTADO DEL PRESENTE CÓDIGO
+%https://www.overleaf.com/5391762413yjwqsjfpjhhc#334e95
+
+\documentclass{article}
+\usepackage[spanish]{babel}
+\usepackage[letterpaper,top=2cm,left=1.7cm,right=1.7cm,marginparwidth=1.5cm]{geometry}
+\usepackage{amsmath}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{subcaption}
+
+\title{Inserción de imágenes}
+\author{Mariana Conde}
+\date{}
+
+\begin{document}
+
+\maketitle
+\section{Inserción de una imagen}
+%   ref SE UTILIZA PARA QUE DENTRO DEL TEXTO SE INDIQUE EL NÚMERO DE LA IMAGEN A LA QUE SE ESTÁ REFIRIENDO
+% SI DENTRO DEL DOCUMENTO SE AGREGAN IMAGENES ANTES DE ESTA, ENTONCES SE ACTUALIZARÁ DE MANERA AUTOMÁTICA LA NUMERACIÓN DE LAS IMÁGENES POSTERIORES
+
+En la Figura \ref{fig:Ejercicio1_Practica3} se observa que se definieron las variables brillo y período, la primera indica el nivel de brillo que se desea, mientras que la segunda se utilizó para establecer el ciclo de encendido y apagado del led. Mientras menor sea el brillo del led, menor será el tiempo que se mantendrá apagado el led, y, el ojo al ser incapaz de percibir los cambios entre el encendido y el apagado, percibirá un nivel de luz bajo. El código realizado atenua el led, iniciando con un brillo del 100$\%$ y por cada ciclo se reduce en 0.2 el brillo; así mismo, se mandó a imprimir en la consola de thonny el nivel de brillo, el tiempo de encendido y de apagado. 
+\begin{figure}[h]
+    \centering  %   CENTRA LA IMAGEN
+    % width DEFINE EL TAMAÑO DE LA IMAGEN Y POSTERIORMENTE SE DEBE INGRESAR EL NOMBRE DE LA IMAGEN QUE SE DESEA INSERTAR
+    \includegraphics[width=0.35\linewidth]{Ejercicio1_Practica3.png}
+    \caption{\label{fig:Ejercicio1_Practica3}Código realizado para atenuar de manera periódica el led centinela}    % SE UTILIZA PARA DARLE UN TÍTULO DE LA IMAGEN. label SE UTILIZA PARA QUE AL CREAR UN HIPERVÍNCULO HACIA LA IMAGEN, SE PUEDA SABER EN ref A QUIEN SE ESTÁ LLAMANDO
+\end{figure}
+
+\section{Inserción de dos imágenes en un renglón}
+Si se desea que se inicie de manera automática, basta con seleccionar la opción \textbf{\textit{"save"}} en Thonny, al hacerlo el programa preguntará en dónde se desea guardar el código (véase Figura \ref{fig:Ejercicio4(1)_Practica3}) basta con darle clic a \textbf{\textit{"MicroPython device"}} para que se muestre en pantalla el o los programas que han sido guardados en el dispositivo. Sin embargo, para que inicie de manera automática el programa que queremos guardar, éste se debe guardar con el nombre \textbf{\textit{boot.py}} (véase Figura \ref{fig:Ejercicio4(2)_Practica3}), ya que el ESP32 trabaja por prioridades, por lo que el código boot significa que es el programa principal.
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}[b]{0.4\linewidth}
+        \includegraphics[width=\linewidth]{Ejercicio4(1)_Practica3.png}
+        \caption{Guardar el código en el dispositivo ESP32}
+        \label{fig:Ejercicio4(1)_Practica3}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.4\linewidth}
+        \includegraphics[width=\linewidth]{Ejercicio4(2)_Practica3.png}
+        \caption{Reescribir el nuevo código}
+        \label{fig:Ejercicio4(2)_Practica3}
+    \end{subfigure}
+    \caption{Carga de un archivo boot.py en el ESP32}
+    \label{fig:Ejercicio4}
+\end{figure}
+
+\end{document}
