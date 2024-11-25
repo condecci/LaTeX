@@ -1,0 +1,85 @@
+%   EN EL SIGUIENTE LINK SE ENCUENTRA EL ARCHIVO EN OVERLEAF PARA MOSTRAR EL RESULTADO DEL PRESENTE CÓDIGO
+%   https://www.overleaf.com/read/mwwsbjyjxpxk#28e4d3
+
+\documentclass{article}
+\usepackage[spanish]{babel}
+\usepackage[letterpaper,top=2cm,bottom=2cm,left=1.7cm,right=1.7cm,marginparwidth=1.5cm]{geometry}
+\usepackage{graphicx} % Required for inserting images
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+%   PARA REFERENCIAS
+%   EN style SE COLOCA EL FORMATO EN EL QUE SE DESEA SE MUESTREN LAS REFERENCIAS
+%   ALGUNOS ESTILOS SON: 
+%   - numeric: Números consecutivos para las citas.
+%   - alphabetic: Códigos alfabéticos basados en autores y años.
+%   - authoryear: Citas en formato autor-año (ideal para humanidades).
+%   - ieee: Formato IEEE.
+%   - mla: Estilo MLA.
+%   - apa: Estilo APA (6ª o 7ª edición).
+\usepackage[backend=biber,style=apa, citestyle=numeric, sorting=none,defernumbers=true]{biblatex}
+%   SE DEBE CREAR UN ARCHIVO CON LA EXTENSIÓN ".bib" EN DONDE VAN A ESTAR CONTENIDAS TODAS LAS REFERENCIAS QUE SE DESEEN INCLUIR EN LA BIBLIOGRAFÍA
+%   LA SIGUIENTE FUNCIÓN SE UTILIZA PARA MANDAR LLAMAR EL ARCHIVO EN DONDE SE ENCUENTRAN LAS REFERENICAS
+\addbibresource{sample.bib}
+%   SI UNA REFERENCIA ABARCA MÁS DE UN RENGLÓN ENTONCES SE COLOCA LA SIGUIENTE FUNCIÓN PORQUE SI NO, EL SEGUNDO RENGLÓN SE ESCRIBE CON SANGRÍA
+\setlength\bibhang{0pt}
+
+\title{Bibliografía utilizando biblatex}
+\author{Mariana Conde Feria}
+\date{}
+\begin{document}
+\maketitle
+\begin{abstract}
+    
+\end{abstract}
+
+\section{Creación de un archivo}
+Para crear el archivo con extensión \textbf{\textit{.bib}}, en el panel lateral izquierdo se encuentra la lista de archivos e imágenes cargados para uso del documentos, hasta arriba de la lista, el primer ícono se utiliza para crear un archivo nuevo (véase Figura \ref{fig:Creacion_Archivo}). 
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Creacion_Archivo.png}
+    \caption{Creación de un archivo}
+    \label{fig:Creacion_Archivo}
+\end{figure}
+
+Basta con darle un nombre y colocarle la extensión, por ejemplo: \textbf{\textit{"sample.bib"}}. (véase Figura \ref{fig:Creacion_ArchivoBib}).
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Creacion_ArchivoBib.png}
+    \caption{Creación de un archivo bib}
+    \label{fig:Creacion_ArchivoBib}
+\end{figure}
+\newpage
+\section{Referencias en un archivo bib}
+Una vez creado el archivo Bib, en el panel lateral izquierdo aparecerá dicho archivo. Al darle clic a dicho archivo se abrirá un archivo en blanco, dentro del archivo, es posible especificar el tipo de referencia que se desea incluir. Por tal motivo, al momento de escribir \textbf{\textit{\textcolor{blue}{@}}} se desplegará un menú el cual mostrará todas las opciones para referencias. (véase Figura \ref{fig:ListadoReferencias}).
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.35\linewidth]{ListadoReferencias.png}
+    \caption{Tipos de referencias}
+    \label{fig:ListadoReferencias}
+\end{figure}
+
+Una vez escogido el tipo de referencia, basta con darle enter y se agregará al archivo la estructura de dicha referencia, finalmente se deben llenar los campos solicitados en la estructura agregada. (véase Figura \ref{fig:ReferenciaSeleccionada})
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.35\linewidth]{ReferenciaSeleccionada.png}
+    \caption{Selección de una referencia}
+    \label{fig:ReferenciaSeleccionada}
+\end{figure}
+
+Se pueden agregar cuantas referencias se deseen, a continuación se presenta un ejemplo de como puede quedar un archivo.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.35\linewidth]{EjemploReferencias.png}
+    \caption{Ejemplo de un archivo bib}
+    \label{fig:EjemploReferencias}
+\end{figure}
+\newpage
+%   SI SE UTILIZA LA PAQUETERÍA BIBILATEX Y NO SE CITAN LAS REFERENCIAS, ÉSTAS NO VAN A APARECER EN EL DOCUMENTO, POR TAL MOTIVO, SE DEBE AGREGAR LA SIGUIENTE FUNCIÓN INCLUYENDO EN EL PARÉNTESIS EL *
+\nocite{*}  % IMPRIME TODA LA BIBLIOGRAFÍA CONTENIDA EN EL ARCHIVO sample.bib
+%   SE MANDAR LLAMAR A TODAS LAS REFERENCIAS SE DEBE AGREGAR LA SIGUIENTE FUNCIÓN
+\printbibliography
+
+
+
+
+\end{document}
