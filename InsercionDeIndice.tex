@@ -1,0 +1,512 @@
+%   EN EL SIGUIENTE LINK SE ENCUENTRA EL ARCHIVO EN OVERLEAF PARA MOSTRAR EL RESULTADO DEL PRESENTE CÓDIGO
+%   https://www.overleaf.com/read/xngsqrqnrvbf#1fabff
+
+\documentclass{article}
+\usepackage[spanish, es-tabla]{babel}
+\usepackage[letterpaper,top=2cm,left=1.7cm,right=1.7cm,marginparwidth=1.5cm]{geometry}
+\usepackage{amsmath}
+\usepackage{graphicx} % Required for inserting images
+\usepackage[colorlinks=true, linkcolor=GrisIndice, urlcolor=blue,citecolor=blue]{hyperref}
+
+\usepackage{subcaption}
+\usepackage{array}
+\usepackage[table,xcdraw]{xcolor}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{float}
+\usepackage{listings}
+\definecolor{grisClaro}{RGB}{232, 232, 232}
+\definecolor{GrisIndice}{RGB}{51,51,51}
+
+\title{Control de la ventana de un auto}
+\author{Mariana Conde Feria}
+
+\lstdefinelanguage{VHDL}{
+  morekeywords={
+    architecture, entity, is, port, in, out, signal, process, begin, end, if, then, else, when, others, case, report, severity, library, use, all, wait, for, generic,type,signal,rising_edge, attribute
+  },
+  sensitive=true,
+  morecomment=[l]--,     % comentario de una línea
+  morestring=[b]",       % comillas dobles para cadenas de texto
+}
+\lstset{
+  language=VHDL,
+  basicstyle=\ttfamily\footnotesize, % estilo de fuente (monoespaciada)
+  keywordstyle=\color{blue}\bfseries, % palabras clave en azul y negrita
+  commentstyle=\color{gray}, % comentarios en gris
+  stringstyle=\color{red}, % cadenas de texto en rojo
+  numbers=left, % mostrar números de línea a la izquierda
+  numberstyle=\tiny\color{gray}, % estilo de los números de línea
+  stepnumber=1, % numerar cada línea
+  breaklines=true, % dividir las líneas largas
+  tabsize=2, % tamaño de tabulación
+  frame=single,
+  captionpos = t
+}
+\renewcommand{\lstlistingname}{Código}
+
+\begin{document}
+\renewcommand{\contentsname}{Índice General}
+\maketitle
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   PARA INSERTAR UN INDICE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\tableofcontents
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   PARA INSERTAR INDICE DE IMÁGENES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\listoffigures
+
+\newpage
+\section{Objetivo}
+\begin{itemize}
+    \item Diseñar una máquina de estados que permita describir el comportamiento de la puerta
+    \item Utilizar el lenguaje descriptivo VHDL para implementar la máquina de estados 
+    
+\end{itemize}
+\section{Introducción}
+Hoy en día el uso de tarjetas de desarollo como CPLDs y FPGAs ha ayudado considerablemente en el diseño de sistemas digitales. Su principal característica es que para poder utilizarlas se requiere del Software de Diseño Quartus, este permite realizar aálisis y síntesis en HDL, así como también simulaciones para corroborar si el sistema diseñado funciona correctamente, lo que no sólo reduce costos en materiales, sino también ahorra tiempo, cosa que anteriormente resultaba imposible puesto que para las pruebas forzosamente se debían realizar conexiones físicas. 
+
+Para el diseño de sistemas digitales, se cuenta con un lenguaje propio, siendo llamado lenguaje descriptivo, por supuesto existe Verilog y VHDL, pero para propósito del presente trabajo, se utilizó el lenguaje VHDL. Si bien es cierto, su sintaxis es similar a algunos lenguajes de programación como Pascal o C, ya que cuenta con sentencias condicionales o concurrentes, sin embargo este lenguaje no se debe ver como una codificación normal sino como un descripción del comportamiento que se espera obtener del sistema.
+\section{Antecedentes}
+\subsection{DE10-Lite}
+La De10-Lite es una placa de desarrollo de la empresa Terasic, esta placa tiene la particularidad de ser una FPGA (Field-Programmable Gate Array) Altera Max 10, por lo que el diseño de hardware es bastante robusto. Si bien es cierto que el precio de esta placa de desarrollo no es tan económico en comparación con otras placas de desarrollo, dado que cuenta con un hardware robusto, ya no se requiere de tanto hardware para la implementación de los códigos realizados. A continuación se presentan las características principales de esta placa de desarollo: 
+\begin{itemize}
+    \item Dispositivo MAX 10 10M50DAF484C7G
+    \item ADC duales con 1 entrada analógica y 8 pines de función dual
+    \item 50K elementos lógicos programables
+    \item Memoria Flash de 5,888 Kbits
+    \item 4 PLLs
+    \item Memoria SDRAM de 64 MB x 16 bit en el bus de datos
+    \item 40 pines de GPIOs
+    \item 10 LEDs
+    \item 10 Slide Switches
+    \item 2 Push-Button 
+    \item 6 Display de 7 segmentos
+    \item 2 señales de reloj de 50 MHz
+    \item Una señal de reloj de 24 MHz
+    \item Una señal de reloj de 10MHz
+\end{itemize}
+\subsection{VHDL}
+Por sus siglas en inglés, VHDL significa VHSIC (Very High Speed Integrated Circuit) Hardware Description Language, es decir, es un lenguaje de descripción de Hardware de circuitos integrados de muy alta velocidad. VHDL se desarrolló para dos propósitos:
+\begin{enumerate}
+    \item Como lenguaje de documentación para describir la estructura de circuitos digitales complejos. Como estándar oficial de la IEEE, VHDL proporcionó una forma común de documentar circuitos diseñados.
+    \item VHDL proporcionó características para modelar el comportamiento de un circuito digital, lo que permitió su uso como entrada para programas de software, que, posteriormente se utilizó para simular el funcionamiento del circuito.
+\end{enumerate}
+VHDL es un lenguaje con una sintaxis amplia y flexible que permite el modelado estructuras, en flujo de datos y de comportamiento hardware.
+Investigación acerca de los aspectos y estructuras básicas de los lenguajes descriptivos de hardware y su aplicación en la industria en general
+
+VHDL (por sus siglas en inglés Very High Speed Integrated Circuit) es un lenguaje de descripción de hardware creado para describir, modelar y simular  sistemas digitales, así como también síntesis de circuitos. 
+
+\subsubsection{Ventajas}
+\begin{itemize}
+    \item Permite diseñar, modelar y comprobar un sistema desde un alto nivel de abstracción.
+    \item Los módulos creados pueden utilizarse en diferentes diseños, permitiendo la reutilización del código
+    \item Al estar basado en un estándar (IEEE Std. 1076 – 1987, IEEE Std. 1076 – 1993), los ingenieros de diseño pueden utilizar este lenguaje para minimizar errores de comunicación y problemas de compatibilidad.
+    \item Permite el diseño Top – Down
+\end{itemize}
+
+\subsubsection{Descripción de estructura}
+VHDL puede ser usado como un lenguaje de Netlist, en donde se especifican los componentes del sistema y sus interconexiones.
+\subsubsection{Descripción de comportamiento}
+VHDL se puede utilizar para la descripción comportamental o funcional de un circuito. Sin necesidad de conocer la estructura interna de un circuito, es posible describirlo explicando su funcionalidad. 
+
+\subsubsection {Elementos básicos de VHDL}
+\subsubsection {Biblioteca (Library)}
+Las paqueterías de una librería permiten que las construcciones de VHDL se definan en un archivo de código fuente para posteriormente se utilizado en otros códigos fuente. La paquetería std$\_$logic$\_$1164 define las señales de tipo STD$\_$LOGIC
+\subsubsection{Entidad (Entity)}
+Es el código en donde se describirá un circuito o subcircuito. Será en esta sección en donde se especificarán las variables de entrada y salida, sin embargo, para llevar a cabo la declaración de estas variables, se requiere utilizar la palabra reservada PORT. Dentro del PORT se debe especificar si se trata de una entrada de entrada, salida o bidireccional, así mismo, se debe especificar el tipo de dato con el que se va a trabajar.
+\subsubsection{Arquitectura (Architecture)}
+Dentro de la arquitectura se va a describir a detalle el comportamiento del circuito. Esta sección se compone de dos partes
+\begin{enumerate}
+    \item Región declarativa. Esta sección es previa a la palabra reservada Begin y será en donde se declaran las señales, de igual forma, aquí se pueden declarar los componentes y atributos específicos.
+    \item Cuerpo de la arquitectura. En esta sección se encuentran las instrucciones que definen las funciones lógicas del circuito
+\end{enumerate}
+
+\subsubsection{Identificadores}
+Se utilizar para nombrar un elemento dentro del modelo de VHDL, los nombres que se le asignen al elemento permitirán identificar con mayor facilidad su propósito. Sin embargo, es importante tomar en cuenta que no todas las palabras están disponibles para ser utilizadas como identificadores, tal es el caso de las palabras reservadas. 
+\subsubsection{Operadores}
+Un operador permite construir diferente tipo de expresiones utilizando diferentes tipos de datos. Sin embargo, también existen operadores que se utilizan para la asignación de datos a una variable.
+\subsection{Configuración para la máquina de estados dentro del software Quartus}
+El software utilizado para las placas de desarrollo de la marca Altera, Quartus, permite modificar la configuración bajo la cual se va a compilar el proyecto. A continuación se presentan los tipos de codificaciones que se pueden utilizar dentro de la configuración:
+\begin{itemize}
+    \item \textbf{One-hot}. Esta configuración es la que se tiene de manera predeterminada, no reduce ni elementos logicos ni Flip-Flops, lo que hace que el codigo sea robusto. Es la opción menos óptima si lo que se busca es que utilice el menor número de registros.
+    \item \textbf{Gray}. Como su nombre lo dice, utiliza el código gray, por lo que reduce el número de registros utilizados para la maquina de estados, asi como también, reduce el número de elementos lógicos.
+    \item \textbf{Sequential}. Este utiliza una codificación binaria, es decir su codificación va del 0 a N números pero en codificación binaria. Esta configuración reduce el número de Flip-Flops de la máquina de estados al igual que la cantidad de elementos lógicos.
+    \item \textbf{Compact}. Su funcionalidad es similar al la del código gray, sin embargo, esta configuración utiliza el menor número de bits, por lo que reduce aún más la cantidad de elementos lógicos así como también la cantidad de registros utilizados.
+    \item \textbf{Johnson}. A diferencia del código gray, este utiliza 2 bits por cada estado, lo que ocasiona se generen más Flip-Flops en la máquina de estados. Si bien es cierto que reduce el número de elementos lógicos con respecto a one-hot, la cantidad de elementos lógicos sigue siendo grande.
+\end{itemize}
+Independientemente de la configuración que se utilice, el \textit{RTL Viewer} se puede visualizar, sin embargo, en el caso del código gray, el diagrama de bloques se muestra expandido, es decir, se muestran tanto los elementos lógicos como los registros utilizados para la máquina de estados.
+
+En la Tabla \ref{tab:Attribute_Value} se muestran los atributos que pueden ser utilizados dependiendo de la configuración de la máquina de estados.
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|>{\centering\arraybackslash}p{4cm}|>{\centering\arraybackslash}p{4cm}|}
+        \hline
+        \rule{0pt}{3ex}\textbf{\textit{Atributo}} & \textbf{\textit{Máquina de estados}} \\ \hline
+        \rule{0pt}{3 ex}"Default" & Safe / User-Encoded \\ \hline
+        \rule{0pt}{3ex}"Sequential" & Safe / User-Encoded \\ \hline
+        \rule{0pt}{3 ex}"Gray" & Safe / User-Encoded \\ \hline
+        \rule{0pt}{3 ex}"Johnson" & Safe / User-Encoded \\ \hline
+        \rule{0pt}{3 ex}$"$One-hot" & Safe / User-Encoded \\ \hline
+        \rule{0pt}{3 ex}$"$Compact" & Safe \\ \hline
+    \end{tabular}
+    \caption{Valores de atributo}
+    \label{tab:Attribute_Value}
+\end{table}
+\subsubsection{State Machine Processing}
+Esta configuración permite modificar las codificaciones dependiendo del atributo que se escoja, sin embargo, para modificar el tipo de codificación, se debe acceder a la configuración del software, por lo que cada vez que se desee modificar la codificación se debe acceder a la configuración. 
+
+A continuación se presentan los pasos a seguir para poder acceder a la configuración y modificar el tipo de codificación.
+\begin{enumerate}
+    \item En la barra de herramientas de Quartus buscar \textit{$"$Assignments$"$}. Al dar clic se desplegará un menú.
+    \item Dar clic en \textit{$"$Settings$"$} para poder acceder a la configuración de la compilación
+    \item Buscar la categoría \textit{$"$Compiler Settings$"$} y dar clic en esta para acceder a las configuraciones de la categoría.
+    \item Buscar la opción \textit{$"$Advanced Settings (Synthesis)..$"$}, al dar clic en dicha opción se abrirá una ventana.
+    \item Se debe desplazar hacia abajo hasta encontrar \textit{$"$State Machine Processing$"$}, del lado derecho se muestra la codificación actual, por lo que al dar clic en esta se desplegará un menú que incluye todos los tipos de codificaciones (véase Figura \ref{fig:Config_StateMachineProcessing})
+    \item Una vez seleccionada la configuración, se debe dar clic en \textbf{\textit{ok}} en todas las ventanas de configuración que se hayan abierto.
+\end{enumerate}
+\begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.35\linewidth]{Config_StateMachineProcessing.png}
+        \caption{\label{fig:Config_StateMachineProcessing}Configuración para la máquina de estados}
+    \end{figure}
+\subsubsection{User-Encoded State Machine Processing}
+Esta configuración permite modificar las codificaciones dependiendo del atributo que se escoja. El atributo es el nombre que se le da a los tipos de codificaciones: one-hot, gray, Johnson, sequential, compact.
+
+A continuación se presentan los pasos a seguir para poder habilitar este tipo de configuración y modificar el tipo de codificación.
+\begin{enumerate}
+    \item En la barra de herramientas de Quartus buscar \textit{$"$Assignments$"$}. Al dar clic se desplegará un menú.
+    \item Dar clic en \textit{$"$Settings$"$} para poder acceder a la configuración de la compilación
+    \item Buscar la categoría \textit{$"$Compiler Settings$"$} y dar clic en esta para acceder a las configuraciones de la categoría.
+    \item Buscar la opción \textit{$"$Advanced Settings (Synthesis)..$"$}, al dar clic en dicha opción se abrirá una ventana.
+    \item Se debe desplazar hacia abajo hasta encontrar \textit{$"$State Machine Processing$"$}, del lado derecho se muestra la codificación actual, por lo que al dar clic en esta se desplegará un menú que incluye todos los tipos de codificaciones (véase Figura \ref{fig:Config_StateMachineUserEncoded})
+    \item Dentro del menú se encuentra la opción \textit{User-Encoded}. Esta opción es la que se debe seleccionar para poder modificar el tipo de codificación utilizando la palabra reservada \textbf{\textit{attribute}} Para guardar los cambios, se debe dar clic en \textbf{\textit{ok}} en todas las ventanas de configuración que se hayan abierto.
+\end{enumerate}
+\begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.35\linewidth]{Config_StateMachineUserEncoded.png}
+        \caption{\label{fig:Config_StateMachineUserEncoded}Habilitación de User-Encoded}
+    \end{figure}
+Una vez que se ha habilitado esta configuración, dentro del código, se deben incluir las siguientes líneas:
+\begin{lstlisting}
+    attribute enum_encoding: string;
+    attribute enum_encoding of estados: type is "<Codificacion>";
+\end{lstlisting}
+\subsubsection{Safe State Machine}
+Al habilitar esta configuración, de manera interna, el software agrega un elemento lógico adicional, el es utilizado para detectar algún estado ilegal, por lo que si se detecta este estado, forza la transición de la máquina de estados al inicio de la misma. 
+Un estado ilegal es aquel estado del registro que contenga un valor que no corresponde a cualquiera de los estados definidos dentro de la codificación.
+
+A continuación se presentan los pasos a seguir para poder habilitar este tipo de configuración y modificar el tipo de codificación.
+\begin{enumerate}
+    \item En la barra de herramientas de Quartus buscar \textit{$"$Assignments$"$}. Al dar clic se desplegará un menú.
+    \item Dar clic en \textit{$"$Settings$"$} para poder acceder a la configuración de la compilación
+    \item Buscar la categoría \textit{$"$Compiler Settings$"$} y dar clic en esta para acceder a las configuraciones de la categoría.
+    \item Buscar la opción \textit{$"$Advanced Settings (Synthesis)..$"$}, al dar clic en dicha opción se abrirá una ventana.
+    \item Se debe desplazar hacia abajo hasta encontrar \textit{$"$Safe State Machine Processing$"$}, del lado derecho se muestra la codificación actual, por lo que al dar clic en esta se desplegará un menú que incluye las opciones \textbf{\textit{on/off}} (véase Figura \ref{fig:Config_SafeStateMachine})
+    \item Para habilitar esta configuración basta con dar clic en \textbf{\textit{on}}. Para guardar los cambios, se debe dar clic en \textbf{\textit{ok}} en todas las ventanas de configuración que se hayan abierto.
+\end{enumerate}
+\begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.35\linewidth]{Config_SafeStateMachine.png}
+        \caption{\label{fig:Config_SafeStateMachine}Habilitación de Safe State Machine}
+    \end{figure}
+Una vez que se ha habilitado esta configuración, dentro del código, se deben incluir las siguientes líneas:
+
+\begin{lstlisting}
+    attribute syn_encoding: string;
+    attribute syn_encoding of estados: type is "safe,<Codificacion>";
+\end{lstlisting}
+\subsection{Asignación de pines}
+Dado que la Tarjeta de Desarrollo De10-Lite tiene integrados switches y botones, se buscó dentro del datasheet de la misma los pines correspondientes a estos componentes. (Véase Figura \ref{fig:DiagramaElectrico1})
+\begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.5\linewidth]{DiagramaElectrico_pines_switch.jpg}
+        \caption{\label{fig:DiagramaElectrico1}Diagrma eléctrico de los botones y switches}
+    \end{figure}
+    
+En la Figura \ref{fig:DiagramaElectrico2} se presenta el diagrama eléctrico de las conexiones entre el motor y la DE10-Lite
+\begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.45\linewidth]{DiagramaElectrico_Motor.jpg}
+        \caption{\label{fig:DiagramaElectrico2}Diagrama eléctrico del motor}
+    \end{figure}
+
+
+\section{Desarrollo}
+\subsection{Diseño de la carta ASM}
+Hoy en día, los automóviles cuentan con un sistema electrónico en el cual ya no es necesario darle vuelta a una manija para poder abrir una ventana. Este sistema consiste en únicamente presionar uno o dos botones, según el modelo del carro, para poder subir o baja la ventanilla. Siguiendo este principio, se buscó replicar este comportamiento. A simple vista, el funcionamiento de una ventana resulta sencillo, sin embargo, existe todo un transfondo para lograr que suba o baje. Para poder realizar diseño más adecuado fue necesario identificar todos los posibles escenarios ante determinados comportamientos, dichos escenarios son los presentados a continuación:
+\begin{itemize}
+    \item Es importante aclarar que para el diseño de este sistema se requirieron de dos botones, uno para subir y otro para bajar la ventana. De igual manera, se requirieron de dos sensores de detección, uno inferior y uno superior, para evitar que el motor se mantenga encendido (ver Figura \ref{fig:Comportamiento_Ventana})
+    \item Mientras se mantenga presionado el botón SW1, la ventana baja.
+    \item Mientras se mantenga presionado el botón SW2, la ventana sube.
+    \item Un detalle a considerar es que no se puede colocar un tiempo para que la ventana se abra o cierre en su totalidad ya que esta decisión depende completamente del usuario, por lo que se requiere de un elemento adicional que permita identificar cuando ya se ha cerrado completamente la ventana, y así evitar que el mecanismo del motor encargado de mover la ventana siga funcionando aún cuando la ventana está completamente abierta o completamente cerrada, según sea el caso, para ello se colocaron sensores de detección en ambos extremos de la ventana. Por ende, los sensores de detección son los encargados de apagar el motor aún cuando se se siga presionando alguno de los botones, por ejemplo: el motor se apaga cuando el botón para subir se encuentra presionado y el sensor superior ha detectado un pulso.
+    \item Es importante tomar en cuenta que si se ha detectado algunos de los sensores, por ejemplo el superior y se desea bajar la ventanilla, se debe incluir esta posibilidad de lo contrario, si se presiona dicho botón la ventana no hará nada, ocasionando que el sistema se vuelva ineficiente.
+    \item Así mismo, se deben tomar en cuenta los casos en los que se dejan de detectar los pulsos por parte de alguno de los botones, esto porque al igual que en un carro, al presionar algún botón, este no abre o cierra completamente la ventana, esta decisión se deja totalmente al usuario. Por tal motivo, si el botón se deja de presionar, la ventana se debe quedar a la altura que haya deseado el usuario.
+\end{itemize}
+\begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.35\linewidth]{Comportamiento_Puerta.png}
+        \caption{\label{fig:Comportamiento_Ventana}Comportamiento de la ventana}
+    \end{figure}
+
+Para mayor facilidad, el comportamiento previamente descrito se colocó en una tabla de verdad (Tabla \ref{tab:TablaDeVerdad}). En esta tabla presentan los casos para los cuales el motor se habilita, tomando en cuenta los sensores de detección según sea el caso. 
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|>{\centering\arraybackslash}p{1.5cm}|>{\centering\arraybackslash}p{1.5cm}|>{\centering\arraybackslash}p{1.5cm}|>{\centering\arraybackslash}p{1.5cm}|>{\centering\arraybackslash}p{1.5cm}|>{\centering\arraybackslash}p{1.5cm}|>{\centering\arraybackslash}p{1.5cm}}
+        \hline
+        \multicolumn{2}{|c|}{\rule{0pt}{2.5ex}Subir/Bajar} & \multicolumn{2}{c|}{Sensores de detección} & \multicolumn{2}{c|}{Habilitación del motor} \\ \hline
+         \rule{0pt}{2.5ex}SW1 & SW2 & LSW1 & LSW2 & ENA1 & ENA2  \\ \hline
+        \rule{0pt}{2.5ex}1 & 0 & 0 & 0 & \cellcolor{lightgray}1 & \cellcolor{lightgray}0 \\
+         \rule{0pt}{2.5ex}0 & 1 & 0 & 0 & \cellcolor{lightgray}0 & \cellcolor{lightgray}1 \\
+         \rule{0pt}{2.5ex}1 & 0 & 1 & 0 & 0 & 0 \\
+         \rule{0pt}{2.5ex}0 & 1 & 0 & 1 & 0 & 0 \\
+         \rule{0pt}{2.5ex}0 & 1 & 1 & 0 & \cellcolor{lightgray}0 & \cellcolor{lightgray}1 \\
+         \rule{0pt}{2.5ex}1 & 0 & 0 & 1 & \cellcolor{lightgray}1 & \cellcolor{lightgray}0 \\ \hline
+    \end{tabular}
+    \caption{Tabla de verdad}
+    \label{tab:TablaDeVerdad}
+\end{table}
+
+Una vez identificadas todas las posibilidades que se pueden presentar, se procedió a diseñar la carta ASM, para ello se utilizaron 7 estados, de los cuales los últimos 6 corresponden al comportamiento de subida y bajada de la ventana, tomando en cuenta los sensores superior en inferior. Dichos estados son los descritos a continuación:
+\begin{enumerate}
+    \item \textbf{E1}. Dado que para el diseño del sistema se escogió una máquina de estados Moore, se requieren inicializar todas las salidas en el inicio de la carta ASM. Cuando un automóvil se encuentra apagado y se enciende, la ventana no se mueve a menos que el usuario lo desee, por tal motivo, en el estado 1 se inicializaron las señales \textit{ENA1} y \textit{ENA2}, asignándoles un valor igual a cero, es decir, cuando inicie el sistema, el motor se mantiene apagado.
+    \item \textbf{Baja}. Al momento de detectar un pulso en la señal \textit{SW1} (Botón de bajada) entonces se habilita la señal \textit{ENA1}, lo que permitirá bajar la ventanilla.
+    \item \textbf{Guarda1}. Para asegurarse que el motor del mecanismo de la ventana se encendió, se agregó un estado extra en donde se tienen habilitadas las mismas señales que el estado anterior.
+    \item \textbf{Paro1}. Si mientras se encuentra presionado el botón de bajada (\textit{SW1}) ya se ha detectado el sensor inferior(\textit{LSW1}), entonces el motor se apaga.
+    \item \textbf{Sube}. Al momento de detectar un pulso por parte de la señal \textit{SW2} (Botón de subida) entonces se habilita la señal \textit{ENA2}, permitiendo así subir la ventanilla.
+    \item \textbf{Guarda2}. De igual manera, para asegurarse que el motor se encendió, se agregó un estado extra en donde se tienen habilitadas las mismas señales que el estado anterior.
+    \item \textbf{Paro2}. Si mientras se encuentra presionado el botón de subida (\textit{SW2}) ya se ha detectado el sensor superior (\textit{LSW2}), entonces el motor se apaga.
+\end{enumerate}
+Es importante mencionar que los estados PARO1 y PARO2 se crearon con la finalidad de apagar el motor para evitar que este se force y se dañe, reduciendo así su tiempo de vida. En la Figura \ref{fig:Carta_ASM_PuertaVentana} se presenta el diseño completo de la carta ASM.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Carta_ASM_PuertaAuto.jpg}
+    \caption{\label{fig:Carta_ASM_PuertaVentana}Carta ASM generada}
+\end{figure}
+
+\subsection{Implementación en VHDL}
+Para llevar a cabo la codificación de la Figura \ref{fig:Carta_ASM_PuertaVentana}, fue necesario identificar las señales de entrada y de salida, utilizando los datos proporcionados por la Tabla \ref{tab:TablaDeVerdad}, se identificó que las señales \textit{SW1,SW2,LSW1} y \textit{LSW2} corresponden a las entradas del sistema, mientras que las señales \textit{ENA1} y \textit{ENA2} corresponden a las salidas del sistema. Estas señales fueron declaradas en la entidad del código. 
+
+Dentro de la arquitectura se definieron 4 señales internas, cada una de estas corresponde a las señales previamente declaradas en la entidad, esto se hizo con el objetivo de poder utilizar las lecturas recibidas por parte de las señales dentro de la codificación, el motivo por el cual se optó por realizar esto y no declarar inicialmente las señales como buffers es debido a que si se declaran de esta manera, a la hora de asignar pines, estos se muestran como salidas. Para la máquina de estados se definieron utilizando la palabra reservada \textbf{\textit{type}}, se declaró una señal que permita acceder a los estados.
+
+El funcionamiento de la máquina de estados es síncrono, dado que la señal de reloj interna con la que cuenta la DE10-Lite es de 50MHz, se utilizó un divisor de frecuencia diseñado para una frecuencia de 100 Hz, esto para poder observar el comportamiento del motor. Por conveniencia, el código completo se encuentra en el \hyperref[appendixA]{Apéndice A}.
+
+Finalmente, para implementar la carta ASM se utilizó la estructura de selección \textbf{\textit{case}}, en la cual dependiendo de lo recibido por parte de los botones y/o sensores, se pasa a alguno de los estados según sea el caso. Para mayor comprensión, a continuación se presetan la codificación utilizada para la máquina de estados.
+\begin{lstlisting}[caption={Máquina de estados},label={lst:state_machine}]
+process(div)
+begin
+	if  rising_edge(div) then
+		case (presente) is
+		when inicio => 
+			ENA1 <= '0';
+			ENA2 <= '0';
+			presente <= e1;
+		when e1 =>
+			ENA1 <= '0'; ENA2 <= '0';
+			if (SW_1 = '1' and SW_2 = '0' and LSW_1 = '0' and LSW_2 = '0')   then
+				presente <= baja;
+			elsif (SW_1 = '0' and SW_2 = '1' and LSW_1 = '0' and LSW_2 = '0') then
+				presente <= sube;
+			elsif (SW_1 = '0' and SW_2 = '1' and LSW_1 = '1' and LSW_2 = '0') then
+				presente <= sube;
+			elsif (SW_1 = '1' and SW_2 = '0' and LSW_1 = '0' and LSW_2 = '1') then
+				presente <= baja;
+			end if;
+		END CASE;
+	end if;
+end process;
+\end{lstlisting}
+Por conveniencia, el código completo se encuentra en el \hyperref[appendixB]{Apéndice B}.
+
+\section{Resultados}
+Una vez finalizada la codificación, se procedió a realizar la compilación de todos los archivos generados dentro del proyecto en Quartus. Al completarse la codificación, Quartus permite visualizar tanto el diagrama de bloques generado como la máquina de estados. 
+
+Para poder acceder al diagrama de bloques, en la barra de herramientas se debe buscar \textbf{\textit{Tools}}, al dar clic se despliega un menú de opciones por lo que es necesario acceder a \textbf{\textit{Netlist Viewers}}, al dar clic en \textbf{\textit{RTL Viewer}} se muestra el diagrama completo (véase Figura \ref{fig:RTL_Viewer})
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.9\linewidth]{RTL_Viewer.jpg}
+    \caption{\label{fig:RTL_Viewer}RTL Viewer}
+\end{figure}
+
+Cuando se está codificando en VHDL, es común que se cometa el error de hacerlo como si fuera cualquier lenguaje de programación, lo que da como resultado comportamientos extraños, es decir, comportamientos que no se están definiendo dentro de la codificación, por tal motivo, el poder visualizar el diagrama de bloques permite tener una mejor noción de si se está implementando correctamente la carta ASM.
+
+En la Figura \ref{fig:RTL_Viewer} se observa que efectivamente, se tienen como señales de entrada \textbf{\textit{SW1, SW2, LSW1, LSW2}}, las cuales corresponden a los botones y sensores de detección; la señal de reloj (\textbf{\textit{clk}}) y como salidas se tienen las habilitaciones que van al motor (\textbf{\textit{ENA1 ,ENA2}}). De igual forma, se observa que hay dos multiplexores, los cuales se encargaran de habilitar los motores, con base en el comportamiento de la Tabla \ref{tab:TablaDeVerdad}. A la hora de realizar la codificación, el divisor de frecuencia se hizo en un arhivo a parte, por lo que, para poder unir este código y el de la carta ASM, se mandó llamar al componente del divisor de frecuencia, por tal motivo, en la Figura \ref{fig:RTL_Viewer} sólo se muestra la caja del divisor, para poder ver su diagrama completo, se dió clic en el bloque. En la Figura \ref{fig:RTL_Viewer_Divisor} se muestra el RTL Viewer del divisor de frecuencia.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\linewidth]{RTL_Viewer_Divisor.jpg}
+    \caption{\label{fig:RTL_Viewer_Divisor}Divisor de frecuencia}
+\end{figure}
+
+De igual manera, para poder acceder a la máquina de estados, en la barra de herramientas se debe buscar \textbf{\textit{Tools}}, al dar clic se despliega un menú de opciones por lo que es necesario acceder a \textbf{\textit{Netlist Viewers}}, al dar clic en \textbf{\textit{State Machine Viewer}} se muestra la máquina de estados generada (véase Figura \ref{fig:StateMachine})
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\linewidth]{StateMachine.jpg}
+    \caption{\label{fig:StateMachine}Máquina de estados}
+\end{figure}
+
+Al comparar la máquina de estados obtenida de Quartus y la carta ASM diseñada, se observa que el comportamiento obtenido es el mismo, esto se debe a que ambos son recursos que permiten diseñar una máquina de estados.
+
+Cuando finaliza la compilación del proyecto, Quartus proporciona un reporte de compilación, en el cual se indica la cantidad de elementos lógicos y registros que se utilizaron para el comportamiento descrito. (Véase Figura \ref{fig:ReporteDeCompilacion}).
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.4\linewidth]{ReporteDeCompilacion.png}
+    \caption{\label{fig:ReporteDeCompilacion}Reporte de Compilación}
+\end{figure}
+
+Tomando en cuenta que únicamente se están utilizados 7 estados dentro de la codificación, se espera se utilicen aproximadamente 3 registros para la máquina de estados, sin embargo, en la Figura \ref{fig:ReporteDeCompilacion} se muestra se obtuvieron un total de 16 registros. Lo anterior se debe a la configuración que tiene la máquina de estados, por defecto la configuración es: \textit{one-hot}, no obstante, esta configuración se puede cambiar. 
+
+Se modificó la configuración del compilador para poder cambiar el tipo de codificación tanto para \textit{Safe State Machine} como \textit{User-Encoded State Machine}. En la Tabla \ref{tab:ConfigStateMachine} se presenta la comparación entre ambas configuraciones.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|>{\centering\arraybackslash}m{1.5cm}|>{\centering\arraybackslash}m{1.5cm}|>{\centering\arraybackslash}m{1.5cm}|>{\centering\arraybackslash}m{1.5cm}|>{\centering\arraybackslash}m{1.5cm}|}
+        \hline
+        Tipo & \multicolumn{2}{|c|}{\rule{0pt}{2.5ex}User-Encoded} & \multicolumn{2}{c|}{Safe} \\ \hline
+         \rule{0pt}{3.5ex} & Registros & Elementos lógicos & Registros & Elementos lógicos  \\ \hline
+        \rule{0pt}{2.5ex}One-hot & 16 & 24 & 16 & 32\\
+         \rule{0pt}{2.5ex}Sequential & 11 & 25 & 11 & 27\\
+         \rule{0pt}{2.5ex}Johnson & 12 & 28 & 12 & 27\\
+         \rule{0pt}{2.5ex}Gray & 11 & 24 & 11 & 22\\
+         \rule{0pt}{2.5ex}Compact & \textbf{-} & \textbf{-} & 11 & 23\\ \hline
+    \end{tabular}
+    \caption{User-Encoded vs Safe}
+    \label{tab:ConfigStateMachine}
+\end{table}
+
+Anteriormente se mencionó que se esperaban aproximadamente 3 registros, sin embargo, el reporte de compilación mostró que sin importar el tipo de codificación que se estuviera utilizando, el número máximo de registros es de 11. Cuando la máquina de estados tiene la codificación gray, al momento de abrir el RTL Viewer, este se muestra completo, lo que hizo posible identificar la cantidad de registros generados. Para la máquina de estados efectivamente se generaron 3 registros, para la habilitación del motor se generaron 2 registros y para el divisor de frecuencia se generaron 6 registros, dando un total de 11.
+
+En el siguiente link: \url{https://youtu.be/cgGoF116Zus} se presenta el comportamiento obtenido de la carta ASM
+
+\section{Conclusión}
+A la hora de diseñar la Carta ASM es importante recordar que se está trabajando con un lenguaje descriptivo y no un lenguaje de programación, ya que esto puede afectar considerablemente los resultados. Para evitar errores a la hora de hacer el diseño, fue necesario hacer la Tabla de verdad que explicara el funcionamiento de la ventana, siendo que cada secuencia que dió como resultado la habilitación del motor, es la que se incluyó en el diamante de decisión de la carta ASM.
+
+Con base en lo obtenido en la Tabla \ref{fig:Config_SafeStateMachine} se conluyó que la codificación más óptima es la del código gray, ya que fue en esta codificación donde se obtuvieron tanto el menor número de registros como de elementos lógicos. No obstante, este caso sólo se presentó cuando estaba habilitada la configuración \textit{Safe State Machine}. Por otro lado, sólo en la configuración \textit{User-Encoded} es en donde se pudo visualizar el RTL Viewer completo de la máquina de estados. Así mismo, la configuración de la máquina de estados seguro es la más ideal, ya que aún cuando se hayan considerado todas las combinaciones que resulten en habilitación o en inhabilitación, siempre existe la posibilidad que alguna combinación no se haya incluido dentro de la descripción.
+
+Si bien es cierto, la Tarjeta de Desarrollo De10-Lite cuenta con 50k elementos lógicos y por ende no debería ser necesario preocuparse por la cantidad de elementos lógicos que se generan, sin embargo, mientras más complejos son los sistemas digitales, mayor será el número de elementos lógicos, por tal motivo, es importante conocer las herramientas de optimización que proporciona Quartus para que en un futuro, no se llegue al límite de elementos lógicos con los que se cuenta en la Tarjeta de Desarrollo
+\addcontentsline{toc}{section}{Referencias}
+\bibliographystyle{alpha} 
+\begin{thebibliography}{1}
+\bibitem{VHDL1} Mano, M., $\&$ Ciletti, M. (2017). \textit{Digital Design With An Introduction to the Verilog HDL, VHDL and System Verilog}. (6a ed). Pearson
+\bibitem{VHDL2} Pardo, F., $\&$ Boluda, J. (1999). \textit{VHDL Lenguaje para síntesis y modelado de circuitos}. (1a ed). RA-MA Editorial
+\bibitem{VHDL3} Ashenden, P. (2008). \textit{The Designer's Guide to VHDL}. (3a ed). Morgan Kaufmann
+\bibitem{VHDL4} Brown, S., Vranesic, Z., $\&$ Departament of Electrical and Computer Engineering, University of Toronto (2005). \textit{Fundamental of Digital Logic with VHDL Design}. (2a ed). Mc Graw Hill.
+\bibitem{SateMachine1} Intel Corporation. (2024, 06 septiembre). \textit{3.4.11 State Machine Processing}. Recuperado de: \url{https://www.intel.com/content/www/us/en/docs/programmable/683283/18-1/state-machine-processing.html}
+\bibitem{SateMachine2} Intel Corporation. (2024, 06 septiembre). \textit{3.4.11.1. Manually Specifying State Assignments Using the syn$\_$encoding Attribute}. Recuperado de: \url{https://www.intel.com/content/www/us/en/docs/programmable/683283/18-1/manually-specifying-state-assignments.html}
+\bibitem{SateMachine3} Intel Corporation. (2024, 06 septiembre). \textit{3.4.11.2. Manually Specifying Enumerated Types Using the enum$\_$encoding Attribute}. Recuperado de: \url{https://www.intel.com/content/www/us/en/docs/programmable/683283/18-1/manually-specifying-enumerated-types.html}
+\bibitem{SateMachine4} Intel Corporation. (2024, 06 septiembre). \textit{3.4.12. Safe State Machine}. Recuperado de: \url{https://www.intel.com/content/www/us/en/docs/programmable/683283/18-1/safe-state-machine.html}
+\end{thebibliography}
+\addcontentsline{toc}{section}{Apéndice}
+\appendix
+\section*{Apéndice A. Divisor de frecuencia}\label{appendixA}
+\begin{lstlisting}
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity DIV_FREQ is
+generic(limit: integer := 249999);
+port(CLK:	in std_logic;
+	  DIVF:	buffer std_logic);
+end DIV_FREQ;
+
+architecture clk of DIV_FREQ is
+begin
+    process(CLK)
+    begin
+        if rising_edge(CLK) then
+            if AUX = limit then
+               AUX <= 0;
+               AUX <= NOT AUX;
+            else
+					AUX <= AUX + 1;
+            end if;
+        end if;
+    end process;
+end clk;
+\end{lstlisting}
+\section*{Apéndice B. Máquina de estados}\label{appendixB}
+\begin{lstlisting}
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity PuertadeAuto is
+	Port(clk:               in  STD_LOGIC;
+         sw1,sw2,lsw1,lsw2: in std_logic;
+         ENA1,ENA2:         out std_logic);
+end PuertadeAuto;
+
+architecture estructura of PuertadeAuto is
+type estados is (inicio,e1,baja,guarda1,sube,guarda2,paro1,paro2);
+signal presente: estados;
+signal div: std_logic;
+signal SW_1,SW_2,LSW_1,LSW_2: std_logic;
+attribute enum_encoding: string;
+attribute enum_encoding of estados: type is "compact";
+
+component DIV_FREQ is
+	port( clk:	in std_logic;
+	   DIVF:	out std_logic);
+end component;
+begin
+reloj: DIV_FREQ port map(clk => clk, DIVF =>div);
+SW_1 <= SW1;
+SW_2 <= SW2;
+LSW_1 <= LSW1;
+LSW_2 <= LSW2;
+process(div)
+begin
+	if  rising_edge(div) then
+		case (presente) is
+		when inicio => 
+			ENA1 <= '0';
+			ENA2 <= '0';
+			presente <= e1;
+		when e1 =>
+			ENA1 <= '0'; ENA2 <= '0';
+			if (SW_1 = '1' and SW_2 = '0' and LSW_1 = '0' and LSW_2 = '0')   then
+				presente <= baja;
+			elsif (SW_1 = '0' and SW_2 = '1' and LSW_1 = '0' and LSW_2 = '0') then
+				presente <= sube;
+			elsif (SW_1 = '0' and SW_2 = '1' and LSW_1 = '1' and LSW_2 = '0') then
+				presente <= sube;
+			elsif (SW_1 = '1' and SW_2 = '0' and LSW_1 = '0' and LSW_2 = '1') then
+				presente <= baja;
+			end if;
+       when baja =>
+    			ENA1 <= '1'; ENA2 <= '0';
+    			presente <= guarda1;
+    		when guarda1 =>
+    			ENA1 <= '1'; ENA2 <= '0';
+    			if(LSW_1 = '1' and LSW_2 = '0') then
+    				presente <= paro1;
+    			else
+    				presente <= inicio;
+    			end if;
+    		when sube =>
+    			ENA1 <= '0'; ENA2 <= '1';
+    			presente <= guarda2;
+    		when guarda2 =>
+    			if(LSW_1 = '0' and LSW_2 = '1') then
+    				presente <= paro2;
+    			else
+    				presente <= inicio;
+    			end if;
+    		when paro1 =>
+    			ENA1 <= '0'; ENA2 <= '0';
+    			presente <= inicio;
+    		WHEN paro2 =>
+    			ENA1 <= '0'; ENA2 <= '0';
+    			presente <= inicio;
+    		when others =>
+    			ENA1 <= '0';
+    			ENA2 <= '0';
+    			presente <= e1;
+		END CASE;
+	end if;
+end process;
+end estructura;
+\end{lstlisting}
+
+
+\end{document}
